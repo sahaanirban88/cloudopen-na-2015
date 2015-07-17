@@ -11,10 +11,12 @@
 hostname {{ grains['id'] }}:
   cmd.run
 
-python-pip:
-  pkg.installed
+basic_pkgs:
+  pkg.installed:
+    - pkgs:
+      - python-pip
 
 boto:
   pip.installed:
     - require:
-      - pkg: python-pip
+      - pkg: basic_pkgs

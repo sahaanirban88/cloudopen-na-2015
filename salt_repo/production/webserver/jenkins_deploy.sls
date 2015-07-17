@@ -1,5 +1,12 @@
 {% set app_version = salt['cmd.run']('runuser -l deploy -c "~/getlatestappversion.sh git@gitlab.com:asaha/mywebapp.git"') %}
 
+deregister:
+  module.run:
+    - name: boto_elb.deregister_instances
+    - m_name: mywebapp
+    - instances:
+      - {{ grains['ec2']['instance_id'] }}
+
 /opt/web/mywebapp:
   file.directory:
     - user: deploy
@@ -11,6 +18,8 @@ fetch_app_archive:
   cmd.run:
     - name: 'git archive --format=tar --remote=git@gitlab.com:asaha/mywebapp.git {{ app_version }} > /tmp/mywebapp-{{ app_version }}.tar'
     - user: deploy
+    - require:
+      - module: deregister
 
 backup_app:
   cmd.wait:
@@ -43,5 +52,14 @@ remove_app_archive:
 app_version:
   grains.present:
     - value: {{ app_version }}
+    - require:
+      - cmd: deploy_app
+
+register:
+  module.run:
+    - name: boto_elb.register_instances
+    - m_name: mywebapp
+    - instances:
+      - {{ grains['ec2']['instance_id'] }}
     - require:
       - cmd: deploy_app

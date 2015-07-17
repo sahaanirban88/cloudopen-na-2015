@@ -1,3 +1,3 @@
 production:
   'myappweb*':
-    - hostconfig
+    - appconfig
