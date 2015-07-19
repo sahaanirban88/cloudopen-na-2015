@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mywebapp" default="build">
+ <!-- Uncomment the following when the tools are in ${basedir}/vendor/bin -->
+ <!-- <property name="toolsdir" value="${basedir}/vendor/bin/"/> -->
+
+ <target name="build"
+          depends="deploy"
+                   description=""/>
+
+   <target name="deploy"
+           description="Deploy application to production web nodes">
+           <sshexec failonerror="true" host="salt-master"
+                    username="${ssh.user}"
+                    keyfile="${ssh.keyfile}"
+                    trust="yes"
+                    command="sudo salt 'myappweb*' state.sls webserver.jenkins_rollback pillar='{appversion: ${appversion}}' saltenv=production --state-output=terse -b ${batchsize}" />
+
+  </target>
+</project>
