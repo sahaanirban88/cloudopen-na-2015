@@ -15,9 +15,11 @@ deregister:
     - makedirs: True
 
 fetch_app_archive:
-  cmd.run:
-    - name: 'git archive --format=tar --remote=git@gitlab.com:asaha/mywebapp.git {{ app_version }} > /tmp/mywebapp-{{ app_version }}.tar'
-    - user: deploy
+  module.run:
+    - name: s3.get
+    - bucket: mywebapp-us
+    - path: mywebapp-{{ app_version }}.tar
+    - local_file: /tmp/mywebapp-{{ app_version }}.tar
     - require:
       - module: deregister
 

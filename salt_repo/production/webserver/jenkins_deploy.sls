@@ -15,9 +15,11 @@ deregister:
     - makedirs: True
 
 fetch_app_archive:
-  cmd.run:
-    - name: 'git archive --format=tar --remote=git@gitlab.com:asaha/mywebapp.git {{ app_version }} > /tmp/mywebapp-{{ app_version }}.tar'
-    - user: deploy
+  module.run:
+    - name: s3.get
+    - bucket: mywebapp-us
+    - path: mywebapp-{{ app_version }}.tar
+    - local_file: /tmp/mywebapp-{{ app_version }}.tar
     - require:
       - module: deregister
 
@@ -26,10 +28,10 @@ backup_app:
     - name: 'rm -rf /opt/web/mywebapp.old; cp -r /opt/web/mywebapp /opt/web/mywebapp.old; rm -rf /opt/web/mywebapp/*'
     - user: deploy
     - require:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
       - file: /opt/web/mywebapp
     - watch:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
 
 deploy_app:
   cmd.wait:
@@ -45,7 +47,7 @@ remove_app_archive:
   cmd.wait:
     - name: 'rm -rf /tmp/mywebapp-{{ app_version }}.tar'
     - require:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
     - watch:
       - cmd: deploy_app
 
