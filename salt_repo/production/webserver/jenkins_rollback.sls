@@ -28,10 +28,10 @@ backup_app:
     - name: 'rm -rf /opt/web/mywebapp.old; cp -r /opt/web/mywebapp /opt/web/mywebapp.old; rm -rf /opt/web/mywebapp/*'
     - user: deploy
     - require:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
       - file: /opt/web/mywebapp
     - watch:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
 
 deploy_app:
   cmd.wait:
@@ -47,7 +47,7 @@ remove_app_archive:
   cmd.wait:
     - name: 'rm -rf /tmp/mywebapp-{{ app_version }}.tar'
     - require:
-      - cmd: fetch_app_archive
+      - module: fetch_app_archive
     - watch:
       - cmd: deploy_app
 
