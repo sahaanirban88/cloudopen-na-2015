@@ -13,7 +13,7 @@
                     username="${ssh.user}"
                     keyfile="${ssh.keyfile}"
                     trust="yes"
-                    command="sudo salt 'myappweb*' state.sls webserver.jenkins_deploy saltenv=production --state-output=terse -b ${batchsize}"
+                    command="sudo salt 'myappweb*' state.sls webserver.jenkins_deploy pillar='{appversion: ${app_version}}' saltenv=production --state-output=terse -b ${batchsize}"
                     />
 
   </target>

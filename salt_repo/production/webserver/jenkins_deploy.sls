@@ -1,5 +1,6 @@
-{% set app_version = salt['cmd.run']('runuser -l deploy -c "~/getlatestappversion.sh git@gitlab.com:asaha/mywebapp.git"') %}
+{% set app_version = salt['pillar.get']('appversion') %}
 
+{% if grains['app_version'] != app_version %}
 deregister:
   module.run:
     - name: boto_elb.deregister_instances
@@ -65,3 +66,4 @@ register:
       - {{ grains['ec2']['instance_id'] }}
     - require:
       - cmd: deploy_app
+{% endif %}
